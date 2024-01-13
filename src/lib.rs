@@ -75,4 +75,9 @@ where
 
         self.insert_left(&left, &right) && self.insert_right(&left, &right)
     }
+
+    pub fn clear(&mut self) {
+        self.left.clear();
+        self.right.clear();
+    }
 }
