@@ -1,14 +1,10 @@
-use std::{
-    collections::{HashMap, HashSet},
-    fmt::Debug,
-    hash::Hash,
-    rc::Rc,
-};
+use std::{fmt::Debug, hash::Hash, rc::Rc};
 
+use hashbrown::{HashMap, HashSet};
+
+mod into_lefts;
 mod lefts;
 mod rights;
-use lefts::Lefts;
-use rights::Rights;
 
 #[derive(Debug)]
 pub struct Many2Many<Left, Right>
@@ -102,19 +98,5 @@ where
         } else {
             None
         }
-    }
-}
-
-impl<Left, Right> Many2Many<Left, Right>
-where
-    Left: Hash + Eq + Clone,
-    Right: Hash + Eq + Clone,
-{
-    pub fn lefts(&self) -> Lefts<'_, Left, Right> {
-        Lefts::new(self.left.keys())
-    }
-
-    pub fn rights(&self) -> Rights<'_, Left, Right> {
-        Rights::new(self.right.keys())
     }
 }
