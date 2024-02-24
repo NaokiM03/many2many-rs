@@ -3,6 +3,7 @@ use std::{fmt::Debug, hash::Hash, rc::Rc};
 use hashbrown::{HashMap, HashSet};
 
 mod into_lefts;
+mod into_rights;
 mod lefts;
 mod rights;
 
