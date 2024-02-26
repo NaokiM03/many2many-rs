@@ -38,12 +38,19 @@ where
     }
 }
 
+impl<Left, Right> Default for Many2Many<Left, Right> {
+    #[inline]
+    fn default() -> Self {
+        Many2Many {
+            left: Default::default(),
+            right: Default::default(),
+        }
+    }
+}
+
 impl<Left, Right> Many2Many<Left, Right> {
     pub fn new() -> Many2Many<Left, Right> {
-        Many2Many {
-            left: HashMap::new(),
-            right: HashMap::new(),
-        }
+        Many2Many::default()
     }
 
     pub fn clear(&mut self) {
