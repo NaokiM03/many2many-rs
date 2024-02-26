@@ -18,6 +18,16 @@ pub struct Many2Many<Left, Right> {
     right: HashMap<Ref<Right>, HashSet<Ref<Left>>>,
 }
 
+impl<Left, Right> PartialEq for Many2Many<Left, Right>
+where
+    Left: Hash + Eq,
+    Right: Hash + Eq,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.left == other.left && self.right == other.right
+    }
+}
+
 impl<Left, Right> Many2Many<Left, Right> {
     pub fn new() -> Many2Many<Left, Right> {
         Many2Many {
