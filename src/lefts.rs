@@ -47,3 +47,25 @@ impl<Left, Right> Many2Many<Left, Right> {
         Lefts(self.left.iter())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::Many2Many;
+
+    #[test]
+    fn test_lefts() {
+        let mut map = Many2Many::new();
+        assert!(map.insert(1, "a"));
+        assert!(map.insert(1, "b"));
+        assert!(map.insert(2, "a"));
+        assert!(map.insert(2, "b"));
+
+        let lefts = map.lefts();
+        assert_eq!(lefts.len(), 2);
+
+        let mut lefts: Vec<&i32> = lefts.collect();
+        lefts.sort();
+        assert_eq!(lefts[0], &1);
+        assert_eq!(lefts[1], &2);
+    }
+}

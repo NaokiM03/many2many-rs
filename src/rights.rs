@@ -47,3 +47,25 @@ impl<Left, Right> Many2Many<Left, Right> {
         Rights(self.right.iter())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::Many2Many;
+
+    #[test]
+    fn test_rights() {
+        let mut map = Many2Many::new();
+        assert!(map.insert(1, "a"));
+        assert!(map.insert(1, "b"));
+        assert!(map.insert(2, "a"));
+        assert!(map.insert(2, "b"));
+
+        let rights = map.rights();
+        assert_eq!(rights.len(), 2);
+
+        let mut rights: Vec<&&str> = rights.collect();
+        rights.sort();
+        assert_eq!(rights[0], &"a");
+        assert_eq!(rights[1], &"b");
+    }
+}
