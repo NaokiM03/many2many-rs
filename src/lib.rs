@@ -103,3 +103,19 @@ where
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::Many2Many;
+
+    #[test]
+    fn test_insert() {
+        let mut map = Many2Many::new();
+        assert!(map.insert(1, "a"));
+        assert!(map.insert(1, "b"));
+        assert!(map.insert(2, "a"));
+        assert!(map.insert(2, "b"));
+
+        assert!(!map.insert(1, "a"));
+    }
+}
