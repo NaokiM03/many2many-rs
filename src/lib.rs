@@ -13,20 +13,12 @@ pub type Ref<T> = std::sync::Arc<T>;
 pub type Ref<T> = std::rc::Rc<T>;
 
 #[derive(Debug)]
-pub struct Many2Many<Left, Right>
-where
-    Left: Hash + Eq + Clone,
-    Right: Hash + Eq + Clone,
-{
+pub struct Many2Many<Left, Right> {
     left: HashMap<Ref<Left>, HashSet<Ref<Right>>>,
     right: HashMap<Ref<Right>, HashSet<Ref<Left>>>,
 }
 
-impl<Left, Right> Many2Many<Left, Right>
-where
-    Left: Hash + Eq + Clone,
-    Right: Hash + Eq + Clone,
-{
+impl<Left, Right> Many2Many<Left, Right> {
     pub fn new() -> Many2Many<Left, Right> {
         Many2Many {
             left: HashMap::new(),
@@ -34,6 +26,17 @@ where
         }
     }
 
+    pub fn clear(&mut self) {
+        self.left.clear();
+        self.right.clear();
+    }
+}
+
+impl<Left, Right> Many2Many<Left, Right>
+where
+    Left: Hash + Eq,
+    Right: Hash + Eq,
+{
     pub fn insert(&mut self, left: Left, right: Right) -> bool {
         match (
             self.left.get_key_value_mut(&left),
@@ -80,11 +83,6 @@ where
         }
 
         true
-    }
-
-    pub fn clear(&mut self) {
-        self.left.clear();
-        self.right.clear();
     }
 
     pub fn get_by_left(&self, left: &Left) -> Option<Vec<&Right>> {
