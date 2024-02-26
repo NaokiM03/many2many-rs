@@ -27,44 +27,6 @@ where
     Left: Hash + Eq + Clone,
     Right: Hash + Eq + Clone,
 {
-    fn insert_left(&mut self, left: &Ref<Left>, right: &Ref<Right>) -> bool {
-        let right = if self.right.contains_key(right) {
-            self.right.keys().find(|x| *x == right).unwrap().clone()
-        } else {
-            right.clone()
-        };
-
-        if !self.left.contains_key(left) {
-            self.left.insert(left.clone(), HashSet::new());
-        }
-
-        self.left.get_mut(left).unwrap().insert(right);
-
-        true
-    }
-
-    fn insert_right(&mut self, left: &Ref<Left>, right: &Ref<Right>) -> bool {
-        let left = if self.left.contains_key(left) {
-            self.left.keys().find(|x| *x == left).unwrap().clone()
-        } else {
-            left.clone()
-        };
-
-        if !self.right.contains_key(right) {
-            self.right.insert(right.clone(), HashSet::new());
-        }
-
-        self.right.get_mut(right).unwrap().insert(left);
-
-        true
-    }
-}
-
-impl<Left, Right> Many2Many<Left, Right>
-where
-    Left: Hash + Eq + Clone,
-    Right: Hash + Eq + Clone,
-{
     pub fn new() -> Many2Many<Left, Right> {
         Many2Many {
             left: HashMap::new(),
@@ -73,14 +35,51 @@ where
     }
 
     pub fn insert(&mut self, left: Left, right: Right) -> bool {
-        if self.left.contains_key(&left) && self.right.contains_key(&right) {
-            return false;
+        match (
+            self.left.get_key_value_mut(&left),
+            self.right.get_key_value_mut(&right),
+        ) {
+            (Some((ll, lr)), Some((rr, rl))) => {
+                if lr.contains(rr) && rl.contains(ll) {
+                    return false;
+                }
+
+                lr.insert(rr.clone());
+                rl.insert(ll.clone());
+            }
+            (Some((ll, lr)), None) => {
+                let rr = Ref::new(right);
+
+                lr.insert(rr.clone());
+
+                let mut set = HashSet::new();
+                set.insert(ll.clone());
+                self.right.insert(rr.clone(), set);
+            }
+            (None, Some((rr, rl))) => {
+                let ll = Ref::new(left);
+
+                let mut set = HashSet::new();
+                set.insert(rr.clone());
+                self.left.insert(ll.clone(), set);
+
+                rl.insert(ll.clone());
+            }
+            (None, None) => {
+                let ll = Ref::new(left);
+                let rr = Ref::new(right);
+
+                let mut set = HashSet::new();
+                set.insert(rr.clone());
+                self.left.insert(ll.clone(), set);
+
+                let mut set = HashSet::new();
+                set.insert(ll.clone());
+                self.right.insert(rr.clone(), set);
+            }
         }
 
-        let left = Ref::new(left);
-        let right = Ref::new(right);
-
-        self.insert_left(&left, &right) && self.insert_right(&left, &right)
+        true
     }
 
     pub fn clear(&mut self) {
