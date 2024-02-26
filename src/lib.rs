@@ -18,6 +18,16 @@ pub struct Many2Many<Left, Right> {
     right: HashMap<Ref<Right>, HashSet<Ref<Left>>>,
 }
 
+impl<Left, Right> Clone for Many2Many<Left, Right> {
+    #[inline]
+    fn clone(&self) -> Self {
+        Many2Many {
+            left: self.left.clone(),
+            right: self.right.clone(),
+        }
+    }
+}
+
 impl<Left, Right> PartialEq for Many2Many<Left, Right>
 where
     Left: Hash + Eq,
