@@ -1,12 +1,12 @@
 use core::fmt;
 
-use std::{fmt::Debug, hash::Hash, rc::Rc};
+use std::{fmt::Debug, hash::Hash};
 
 use hashbrown::{hash_map::Iter, HashSet};
 
-use crate::Many2Many;
+use crate::{Many2Many, Ref};
 
-pub struct Lefts<'a, Left, Right>(Iter<'a, Rc<Left>, HashSet<Rc<Right>>>)
+pub struct Lefts<'a, Left, Right>(Iter<'a, Ref<Left>, HashSet<Ref<Right>>>)
 where
     Left: Hash + Eq + Clone,
     Right: Hash + Eq + Clone;

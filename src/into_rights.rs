@@ -1,12 +1,12 @@
 use core::fmt::{self, Debug};
 
-use std::{hash::Hash, rc::Rc};
+use std::hash::Hash;
 
 use hashbrown::{hash_map::IntoIter, HashSet};
 
-use crate::Many2Many;
+use crate::{Many2Many, Ref};
 
-pub struct IntoRights<Left, Right>(IntoIter<Rc<Right>, HashSet<Rc<Left>>>)
+pub struct IntoRights<Left, Right>(IntoIter<Ref<Right>, HashSet<Ref<Left>>>)
 where
     Left: Hash + Eq + Clone,
     Right: Hash + Eq + Clone;
@@ -22,7 +22,7 @@ where
     fn next(&mut self) -> Option<Self::Item> {
         self.0
             .next()
-            .map(|(right, _left)| Rc::try_unwrap(right).unwrap_or_else(|rc| (*rc).clone()))
+            .map(|(right, _left)| Ref::try_unwrap(right).unwrap_or_else(|rc| (*rc).clone()))
     }
 
     #[inline]
