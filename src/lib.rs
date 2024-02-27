@@ -80,6 +80,20 @@ where
     }
 }
 
+impl<Left, Right> FromIterator<(Left, Right)> for Many2Many<Left, Right>
+where
+    Left: Hash + Eq,
+    Right: Hash + Eq,
+{
+    fn from_iter<T: IntoIterator<Item = (Left, Right)>>(iter: T) -> Self {
+        let mut map = Many2Many::default();
+        iter.into_iter().for_each(|(left, right)| {
+            map.insert(left, right);
+        });
+        map
+    }
+}
+
 impl<Left, Right> Default for Many2Many<Left, Right> {
     #[inline]
     fn default() -> Self {
