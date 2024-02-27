@@ -94,6 +94,16 @@ where
     }
 }
 
+impl<Left, Right, const N: usize> From<[(Left, Right); N]> for Many2Many<Left, Right>
+where
+    Left: Hash + Eq,
+    Right: Hash + Eq,
+{
+    fn from(value: [(Left, Right); N]) -> Self {
+        value.into_iter().collect()
+    }
+}
+
 impl<Left, Right> Default for Many2Many<Left, Right> {
     #[inline]
     fn default() -> Self {
