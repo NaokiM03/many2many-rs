@@ -45,6 +45,41 @@ where
 {
 }
 
+impl<Left, Right> Extend<(Left, Right)> for Many2Many<Left, Right>
+where
+    Left: Hash + Eq,
+    Right: Hash + Eq,
+{
+    #[inline]
+    fn extend<T: IntoIterator<Item = (Left, Right)>>(&mut self, iter: T) {
+        iter.into_iter().for_each(move |(left, right)| {
+            self.insert(left, right);
+        });
+    }
+}
+
+impl<'a, Left, Right> Extend<(&'a Left, &'a Right)> for Many2Many<Left, Right>
+where
+    Left: Hash + Eq + Copy,
+    Right: Hash + Eq + Copy,
+{
+    #[inline]
+    fn extend<T: IntoIterator<Item = (&'a Left, &'a Right)>>(&mut self, iter: T) {
+        self.extend(iter.into_iter().map(|(&left, &right)| (left, right)));
+    }
+}
+
+impl<'a, Left, Right> Extend<&'a (Left, Right)> for Many2Many<Left, Right>
+where
+    Left: Hash + Eq + Copy,
+    Right: Hash + Eq + Copy,
+{
+    #[inline]
+    fn extend<T: IntoIterator<Item = &'a (Left, Right)>>(&mut self, iter: T) {
+        self.extend(iter.into_iter().map(|&(left, right)| (left, right)));
+    }
+}
+
 impl<Left, Right> Default for Many2Many<Left, Right> {
     #[inline]
     fn default() -> Self {
