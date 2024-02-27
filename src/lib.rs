@@ -38,6 +38,13 @@ where
     }
 }
 
+impl<Left, Right> Eq for Many2Many<Left, Right>
+where
+    Left: Hash + Eq,
+    Right: Hash + Eq,
+{
+}
+
 impl<Left, Right> Default for Many2Many<Left, Right> {
     #[inline]
     fn default() -> Self {
