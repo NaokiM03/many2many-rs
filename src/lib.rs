@@ -4,6 +4,7 @@ use hashbrown::{HashMap, HashSet};
 
 mod into_lefts;
 mod into_rights;
+mod iter;
 mod lefts;
 mod rights;
 
