@@ -8,7 +8,6 @@ use crate::{Many2Many, Ref};
 pub struct Iter<'a, Left, Right> {
     current: Option<(&'a Ref<Left>, HashSetIter<'a, Ref<Right>>)>,
     rest: HashMapIter<'a, Ref<Left>, HashSet<Ref<Right>>>,
-    len: usize,
 }
 
 impl<Left, Right> Clone for Iter<'_, Left, Right> {
@@ -16,7 +15,6 @@ impl<Left, Right> Clone for Iter<'_, Left, Right> {
         Iter {
             current: self.current.clone(),
             rest: self.rest.clone(),
-            len: self.len,
         }
     }
 }
@@ -37,7 +35,6 @@ impl<'a, Left, Right> Iterator for Iter<'a, Left, Right> {
     fn next(&mut self) -> Option<Self::Item> {
         if let Some((left, rights)) = &mut self.current {
             if let Some(right) = rights.next() {
-                self.len -= 1;
                 return Some((left, right));
             }
 
@@ -45,7 +42,6 @@ impl<'a, Left, Right> Iterator for Iter<'a, Left, Right> {
 
             if let Some((left, rights)) = &mut self.current {
                 if let Some(right) = rights.next() {
-                    self.len -= 1;
                     return Some((left, right));
                 }
             }
@@ -57,7 +53,17 @@ impl<'a, Left, Right> Iterator for Iter<'a, Left, Right> {
 
 impl<Left, Right> ExactSizeIterator for Iter<'_, Left, Right> {
     fn len(&self) -> usize {
-        self.len
+        let mut len = 0;
+
+        if let Some((_, rights)) = &self.current {
+            len += rights.len();
+        }
+
+        for (_, rights) in self.rest.clone() {
+            len += rights.len();
+        }
+
+        len
     }
 }
 
@@ -65,10 +71,9 @@ impl<Left, Right> FusedIterator for Iter<'_, Left, Right> {}
 
 impl<Left, Right> Many2Many<Left, Right> {
     pub fn iter(&self) -> Iter<'_, Left, Right> {
-        let len: usize = self.left.iter().map(|(_left, rights)| rights.len()).sum();
         let mut rest = self.left.iter();
         let current = rest.next().map(|(left, rights)| (left, rights.iter()));
-        Iter { current, rest, len }
+        Iter { current, rest }
     }
 }
 
