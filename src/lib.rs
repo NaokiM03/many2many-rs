@@ -213,21 +213,21 @@ where
     }
 
     pub fn get_by_left(&self, left: &Left) -> Option<Vec<&Right>> {
-        if let Some(set) = self.left.get(left) {
-            let v = set.iter().map(|x| &(**x)).collect();
-            Some(v)
-        } else {
-            None
-        }
+        let Some(rights) = self.left.get(left) else {
+            return None;
+        };
+
+        let v = rights.iter().map(|right| &(**right)).collect();
+        Some(v)
     }
 
     pub fn get_by_right(&self, right: &Right) -> Option<Vec<&Left>> {
-        if let Some(set) = self.right.get(right) {
-            let v = set.iter().map(|x| &(**x)).collect();
-            Some(v)
-        } else {
-            None
-        }
+        let Some(lefts) = self.right.get(right) else {
+            return None;
+        };
+
+        let v = lefts.iter().map(|left| &(**left)).collect();
+        Some(v)
     }
 
     pub fn contains(&self, left: &Left, right: &Right) -> bool {
