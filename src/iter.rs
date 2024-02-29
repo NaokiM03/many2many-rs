@@ -33,18 +33,22 @@ impl<'a, Left, Right> Iterator for Iter<'a, Left, Right> {
     type Item = (&'a Left, &'a Right);
 
     fn next(&mut self) -> Option<Self::Item> {
-        if let Some((left, rights)) = &mut self.current {
-            if let Some(right) = rights.next() {
-                return Some((left, right));
-            }
+        let Some((left, rights)) = &mut self.current else {
+            return None;
+        };
 
-            self.current = self.rest.next().map(|(left, rights)| (left, rights.iter()));
+        if let Some(right) = rights.next() {
+            return Some((left, right));
+        }
 
-            if let Some((left, rights)) = &mut self.current {
-                if let Some(right) = rights.next() {
-                    return Some((left, right));
-                }
-            }
+        self.current = self.rest.next().map(|(left, rights)| (left, rights.iter()));
+
+        let Some((left, rights)) = &mut self.current else {
+            return None;
+        };
+
+        if let Some(right) = rights.next() {
+            return Some((left, right));
         }
 
         None
