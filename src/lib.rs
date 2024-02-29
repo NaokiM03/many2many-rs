@@ -229,6 +229,14 @@ where
             None
         }
     }
+
+    pub fn contains(&self, left: &Left, right: &Right) -> bool {
+        let Some(rights) = self.left.get(left) else {
+            return false;
+        };
+
+        rights.contains(right)
+    }
 }
 
 #[cfg(test)]
