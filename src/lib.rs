@@ -8,6 +8,8 @@ mod iter;
 mod lefts;
 mod rights;
 
+use iter::Iter;
+
 #[cfg(feature = "thread_safe")]
 pub type Ref<T> = std::sync::Arc<T>;
 #[cfg(not(feature = "thread_safe"))]
@@ -102,6 +104,37 @@ where
 {
     fn from(value: [(Left, Right); N]) -> Self {
         value.into_iter().collect()
+    }
+}
+
+impl<'a, Left, Right> IntoIterator for &'a Many2Many<Left, Right> {
+    type Item = (&'a Left, &'a Right);
+    type IntoIter = Iter<'a, Left, Right>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+impl<Left, Right> IntoIterator for Many2Many<Left, Right>
+where
+    Left: Clone,
+    Right: Clone,
+{
+    type Item = (Left, Right);
+
+    type IntoIter = std::vec::IntoIter<(Left, Right)>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.left
+            .iter()
+            .flat_map(|(left, rights)| {
+                rights
+                    .into_iter()
+                    .map(|right| ((**left).clone(), (**right).clone()))
+            })
+            .collect::<Vec<(Left, Right)>>()
+            .into_iter()
     }
 }
 
